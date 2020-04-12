@@ -30,15 +30,29 @@ print(len(words))
 # Example to show how to add other user defined stop words in spacy
 from spacy.lang.en import English
 nlp = spacy.load('en')  # creating the english language pipeline
+spacy_nlp = spacy.load('en_core_web_sm')  # will try another pipeline later as well
+
+# adding more stop words as per our data
 stop_words = ['become', 'chose']
 for item in stop_words:
     lexeme = nlp.vocab[item]
     lexeme.is_stop = True
 
-cleaned = nlp(' '.join(words)) # Note that for cleaning we are combining words to a string again
+# tokenization using the spacy pipeline
+tokenized = nlp(' '.join(words))  # Note that we can use the pipeline to tokenize
 # nlp pipeline takes a complete string as an argument
-print(type(cleaned)) # This is a spacy object
-cleaned = str(cleaned)
-words_spacy = cleaned.split(' ')
-print('This is the number of words we have after using spacy')
-print(len(words_spacy))
+print(type(tokenized))  # This is a spacy object
+
+spacy_stopwords = spacy.lang.en.stop_words.STOP_WORDS
+cleaned = [token for token in tokenized if token.is_stop == False]
+
+print('Number of words after removing stop words from spaCy are', len(cleaned))
+
+
+# Lemmatization
+
+cleaned_lemma = [token.lemma_ for token in cleaned]
+
+from gensim.models import Phrases
+
+phrases = Phrases(sentences, min_count=1, threshold=1)
